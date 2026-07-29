@@ -1,5 +1,5 @@
 # ============================================================
-# BLOK 1: Import & konfigurasi
+# Import & konfigurasi
 # ============================================================
 import streamlit as st
 import pandas as pd
