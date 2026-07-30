@@ -88,10 +88,10 @@ def load_artifacts():
     bg = joblib.load("shap_background.pkl")          
     explainer = shap.Explainer(f_churn, bg)
 
-    return model, num_cols, cat_cols, transformasi_fitur, nama_fitur, explainer
+    return model, num_cols, cat_cols, transformasi_fitur, nama_fitur, explainer, cap_step, encode_step
 
 try:
-    model, num_cols, cat_cols, transformasi_fitur, nama_fitur, explainer = load_artifacts()
+    model, num_cols, cat_cols, transformasi_fitur, nama_fitur, explainer, cap_step, encode_step = load_artifacts()
 except FileNotFoundError as e:
     st.error(f"File tidak ditemukan: {e.filename}")
     st.stop()
