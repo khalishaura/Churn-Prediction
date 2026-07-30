@@ -6,7 +6,7 @@ import pandas as pd
 import numpy as np
 import joblib
 import shap
-import matplotlib.pyplot as plt
+from sklearn.base import BaseEstimator, TransformerMixin
 
 st.set_page_config(page_title="Prediksi Churn Pelanggan",
                     page_icon="📉", layout="centered")
@@ -45,6 +45,19 @@ def induk(col):
         if col.startswith(prefix):
             return nama
     return label_of(col)
+
+class OutlierCapper(BaseEstimator, TransformerMixin):
+    def __init__(self, kolom):
+        self.kolom = kolom
+    def fit(self, X, y=None):
+        Q1 = X[self.kolom].quantile(0.25)
+        Q3 = X[self.kolom].quantile(0.75)
+        self.batas_atas_ = Q3 + 1.5 * (Q3 - Q1)
+        return self
+    def transform(self, X):
+        X = X.copy()
+        X[self.kolom] = X[self.kolom].clip(upper=self.batas_atas_)
+        return X
 
 # ============================================================
 # Load model, scaler, & explainer
