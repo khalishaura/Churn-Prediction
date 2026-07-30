@@ -51,21 +51,34 @@ def induk(col):
 # ============================================================
 @st.cache_resource
 def load_artifacts():
-    model = joblib.load("MLP.pkl")
-    scaler = joblib.load("scaler.pkl")
-    columns = joblib.load("columns.pkl")
-    batas_atas_outlier = joblib.load("batas_atas_outlier.pkl")
-    bg = joblib.load("shap_background.pkl")   # background SHAP (sudah di-scaling, 100 baris)
+    model = joblib.load("model_churn.pkl")          
+    kolom = joblib.load("kolom_input.pkl")          
+    num_cols, cat_cols = kolom["num_cols"], kolom["cat_cols"]
+
+    # Pre-processing step
+    cap_step    = model.named_steps["cap"]
+    encode_step = model.named_steps["prep"]
+    scaler_step = model.named_steps["scaler"]
+    mlp_only    = model.named_steps["model"]
+
+    def transformasi_fitur(X_mentah):
+        X = cap_step.transform(X_mentah)
+        X = encode_step.transform(X)
+        X = scaler_step.transform(X)
+        return X
+
+    nama_fitur = [n.split("__", 1)[1] for n in encode_step.get_feature_names_out()]
 
     def f_churn(X):
-        return model.predict_proba(np.asarray(X))[:, 1]
+        return mlp_only.predict_proba(np.asarray(X))[:, 1]
 
+    bg = joblib.load("shap_background.pkl")          
     explainer = shap.Explainer(f_churn, bg)
 
-    return model, scaler, columns, batas_atas_outlier, explainer
+    return model, num_cols, cat_cols, transformasi_fitur, nama_fitur, explainer
 
 try:
-    model, scaler, columns, batas_atas_outlier, explainer = load_artifacts()
+    model, num_cols, cat_cols, transformasi_fitur, nama_fitur, explainer = load_artifacts()
 except FileNotFoundError as e:
     st.error(f"File tidak ditemukan: {e.filename}")
     st.stop()
@@ -129,9 +142,9 @@ marital      = st.selectbox("Status pernikahan", ["Single", "Married", "Divorced
 # ============================================================
 # Preprocessing 
 # ============================================================
-raw = {
+raw = pd.DataFrame([{
     "Tenure": tenure,
-    "WarehouseToHome": min(warehouse, batas_atas_outlier),   
+    "WarehouseToHome": warehouse,          
     "HourSpendOnApp": hour_app,
     "NumberOfDeviceRegistered": n_device,
     "NumberOfAddress": n_address,
@@ -140,41 +153,21 @@ raw = {
     "OrderCount": order_count,
     "DaySinceLastOrder": day_last,
     "CashbackAmount": cashback,
-}
-
-# One-hot encoding manual
-raw["PreferredLoginDevice_Mobile Phone"] = int(login_device == "Mobile Phone")
-raw["CityTier_2"]   = int(city_tier == 2)
-raw["CityTier_3"]   = int(city_tier == 3)
-raw["Gender_Male"]  = int(gender == "Male")
-raw["Complain_1"]   = int(complain == "Ya")
-for k in ["Credit Card", "Debit Card", "E wallet", "UPI"]:
-    raw[f"PreferredPaymentMode_{k}"] = int(payment == k)
-for k in ["Grocery", "Laptop & Accessory", "Mobile Phone", "Others"]:
-    raw[f"PreferedOrderCat_{k}"] = int(order_cat == k)
-for k in [2, 3, 4, 5]:
-    raw[f"SatisfactionScore_{k}"] = int(satisfaction == k)
-for k in ["Married", "Single"]:
-    raw[f"MaritalStatus_{k}"] = int(marital == k)
-
-df = pd.DataFrame([raw])
-
-# Jika kolom tidak cocok dengan waktu training, langsung berhenti
-kurang = set(columns) - set(df.columns)
-lebih  = set(df.columns) - set(columns)
-if kurang or lebih:
-    st.error(f"Kolom tidak cocok dengan model.\n\nKurang: {kurang}\n\nBerlebih: {lebih}")
-    st.stop()
-
-df = df[columns]  
-
-df_scaled = pd.DataFrame(scaler.transform(df), columns=columns)
+    "PreferredLoginDevice": login_device,
+    "CityTier": city_tier,
+    "PreferredPaymentMode": payment,
+    "Gender": gender,
+    "PreferedOrderCat": order_cat,
+    "SatisfactionScore": satisfaction,
+    "MaritalStatus": marital,
+    "Complain": int(complain == "Ya"),
+}])
 
 # ============================================================
 # Prediksi
 # ============================================================
 if st.button("Prediksi", type="primary"):
-    proba = model.predict_proba(df_scaled)[0, 1]
+    proba = model.predict_proba(raw)[0, 1]
     churn = proba >= THRESHOLD
 
     st.divider()
@@ -233,8 +226,10 @@ if st.button("Prediksi", type="primary"):
         return col   
 
     with st.spinner("Menghitung penjelasan SHAP..."):
-        sv_one = explainer(df_scaled)          
-        sv_one.data = df[columns].values       
+        X_scaled   = transformasi_fitur(raw)   
+        X_unscaled = encode_step.transform(cap_step.transform(raw))  
+        sv_one = explainer(X_scaled)
+        sv_one.data = X_unscaled
         vals = sv_one.values[0]
 
     st.divider()
@@ -251,7 +246,7 @@ if st.button("Prediksi", type="primary"):
     sudah_tampil = set()
     ditampilkan = 0
     for i in idx_urut:
-        nama_kolom = columns[i]
+        nama_kolom = nama_fitur[i]
         kalimat = deskripsi_fitur(nama_kolom)
         if kalimat in sudah_tampil:
             continue
