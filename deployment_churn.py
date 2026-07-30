@@ -133,7 +133,7 @@ with c1:
     warehouse    = st.number_input("Jarak gudang ke rumah (km)", 0, 50, 15)
     hour_app     = st.number_input("Jam pakai aplikasi per hari", 0, 24, 3)
     n_device     = st.number_input("Jumlah perangkat terdaftar", 1, 10, 3)
-    satisfaction = st.selectbox("Skor kepuasan", [1, 2, 3, 4, 5], index=2)
+    satisfaction = st.selectbox("Skor kepuasan", [1, 2, 3, 4, 5], index=4)
     n_address    = st.number_input("Jumlah alamat tersimpan", 1, 25, 3)
 with c2:
     complain     = st.selectbox("Pernah komplain?", ["Tidak", "Ya"])
