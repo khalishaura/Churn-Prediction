@@ -42,4 +42,4 @@ The app lets users input customer information and get:
 * The predicted churn outcome and probability
 * The top 3 factors contributing to the customer's churn or retention prediction based on SHAP
 
-> 🔗 [**Live demo:**](https://churn-prediction-ecommerce.streamlit.app/)
+> 🔗 Streamlit Dashboard: [**Live demo**](https://churn-prediction-ecommerce.streamlit.app/)
