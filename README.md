@@ -3,8 +3,6 @@
 ## Overview 
 This project develops a classification machine learning model to predict customer churn for an e-commerce business, covering **exploratory data analysis, data preprocessing, model comparison, model explainability with SHAP (SHapley Additive exPlanations), and deployment as an interactive Streamlit application**. 
 
-> 🔗 [**Live demo:**] (https://churn-prediction-ecommerce.streamlit.app/)
-
 ## Data Source 
 The raw dataset was sourced from [Kaggle](https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction)
 
@@ -43,4 +41,5 @@ SHAP values are used to show which features push a customer's churn probability 
 The app lets users input customer information and get:
 * The predicted churn outcome and probability
 * The top 3 factors contributing to the customer's churn or retention prediction based on SHAP
-🔗 [**Live demo:**] (https://churn-prediction-ecommerce.streamlit.app/)
+
+> 🔗 [**Live demo:**] (https://churn-prediction-ecommerce.streamlit.app/)
