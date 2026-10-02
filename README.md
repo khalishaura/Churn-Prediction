@@ -32,7 +32,7 @@ Several models were trained and compared. The best-performing model is a **Multi
 
 ## Model Interpretability (SHAP)
 
-SHAP values are used to show which features push a customer's churn probability up or down, both across the whole dataset and for a single customer. This makes the model's predictions easier to trust and act on.
+SHAP values are used to show which features push a customer's churn probability up or down, both across the whole dataset (global) and for a single customer (local/individual). 
 
 **Top 3 drivers of churn:**  Tenure, customer complaints, and preferred order category (based on whole dataset/global) 
 
