@@ -1,12 +1,12 @@
 # Churn-Prediction
 
 ## Overview 
-This project develops a classification machine learning model to predict customer churn for an e-commerce business, covering **exploratory data analysis, data preprocessing, model comparison, model explainability with SHAP, and deployment as an interactive Streamlit application**. 
+This project develops a classification machine learning model to predict customer churn for an e-commerce business, covering **exploratory data analysis, data preprocessing, model comparison, model explainability with SHAP (SHapley Additive exPlanations), and deployment as an interactive Streamlit application**. 
 
-> 🔗 **Live demo:** [https://churn-prediction-ecommerce.streamlit.app/]
+> 🔗 [**Live demo:**] (https://churn-prediction-ecommerce.streamlit.app/)
 
 ## Data Source 
-[Dataset Source](https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction)
+The raw dataset was sourced from [Kaggle](https://www.kaggle.com/datasets/ankitverma2010/ecommerce-customer-churn-analysis-and-prediction)
 
 ---
 
@@ -32,8 +32,15 @@ Several models were trained and compared. The best-performing model is a **Multi
 
 > Models compared: Logistic Regression, MLP, Random Forest, XGBoost, LightGBM, Catboost
 
-## 🔍 Model Interpretability (SHAP)
+## Model Interpretability (SHAP)
 
 SHAP values are used to show which features push a customer's churn probability up or down, both across the whole dataset and for a single customer. This makes the model's predictions easier to trust and act on.
 
 **Top 3 drivers of churn:**  Tenure, customer complaints, and preferred order category (based on whole dataset/global) 
+
+## Streamlit App
+
+The app lets users input customer information and get:
+* The predicted churn outcome and probability
+* The top 3 factors contributing to the customer's churn or retention prediction based on SHAP
+🔗 [**Live demo:**] (https://churn-prediction-ecommerce.streamlit.app/)
